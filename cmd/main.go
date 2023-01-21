@@ -1,11 +1,9 @@
 package main
 
 import (
-	"awesomeProject/internal"
-	"fmt"
+	"awesomeProject/internal/app"
 )
 
 func main() {
-	config := internal.GetConfig()
-	fmt.Println(config)
+	app.Run()
 }
