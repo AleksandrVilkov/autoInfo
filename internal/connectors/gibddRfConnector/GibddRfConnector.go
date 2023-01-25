@@ -2,45 +2,86 @@ package gibddRfConnector
 
 import (
 	"awesomeProject/internal/connectors/gibddRfConnector/entity"
+	"awesomeProject/internal/dto"
+	"awesomeProject/pkg/logger"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 )
 
 type GibddRFConnector struct {
-	BaseUrl string
+	logger logger.Logger
 }
 
-//func (g GibddRFConnector) getCarInformation(request connectors.RequestParams) {
-//	//getHistoryInfo()
-//	//getCarAccidentInfo()
-//	//getWantedInfo()
-//	//getRestrictInfo()
-//	//getDiagnosticInfo()
-//	//	return nil
-//}
-
-func (g GibddRFConnector) getCaptcha(req entity.CaptchaReq) *entity.CaptchaResp {
-	return nil
+func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error) {
+	//getCarAccidentInfo()
+	//getWantedInfo()
+	//getRestrictInfo()
+	//getDiagnosticInfo()
+	return nil, nil
 }
 
-func getHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
+func NewGibddRFConnector() (*GibddRFConnector, error) {
+	result := new(GibddRFConnector)
+	newLogger, err := logger.NewLogger("Gibdd_Rf_Connector")
+
+	if err != nil {
+		return nil, err
+	}
+
+	result.logger = *newLogger
+	return result, nil
+}
+
+func (g *GibddRFConnector) GetCaptcha() (*entity.CaptchaResp, error) {
+	resp, errReq := http.Get("https://check.gibdd.ru/captcha")
+
+	if errReq != nil || resp.StatusCode != 200 {
+		g.logger.WriteError("Failed GET Request Attempt to https://check.gibdd.ru/captcha")
+		return nil, errReq
+	}
+
+	body, errBody := io.ReadAll(resp.Body)
+
+	if errBody != nil {
+		g.logger.WriteError("Failed read response body from https://check.gibdd.ru/captcha")
+		return nil, errBody
+	}
+
+	var result entity.CaptchaResp
+	fmt.Println(string(body))
+
+	errUnmarshal := json.Unmarshal(body, &resp)
+
+	if errUnmarshal != nil {
+		g.logger.WriteError("Failed unmarshal response from https://check.gibdd.ru/captcha")
+		return nil, errUnmarshal
+	}
+
+	return &result, nil
+}
+
+func (g *GibddRFConnector) etHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
 	return nil
 	//TODO отправка запросов к POST "https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history"
 }
 
-func getCarAccidentInfo(req entity.CarAccidentReq) *entity.CarAccidentResp {
+func (g *GibddRFConnector) getCarAccidentInfo(req entity.CarAccidentReq) *entity.CarAccidentResp {
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp
 	return nil
 }
 
-func getWantedInfo(req entity.WantedReq) *entity.WantedResp {
+func (g *GibddRFConnector) getWantedInfo(req entity.WantedReq) *entity.WantedResp {
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted
 	return nil
 }
-func getRestrictInfo(req entity.RestrictReq) *entity.RestrictResp {
+func (g *GibddRFConnector) getRestrictInfo(req entity.RestrictReq) *entity.RestrictResp {
 	return nil
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict
 }
 
-func getDiagnosticInfo(req entity.DiagnosticReq) *entity.DiagnosticResp {
+func (g *GibddRFConnector) getDiagnosticInfo(req entity.DiagnosticReq) *entity.DiagnosticResp {
 	return nil
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic
 }

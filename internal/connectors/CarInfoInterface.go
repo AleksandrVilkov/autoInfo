@@ -1,10 +1,10 @@
 package connectors
 
 import (
-	"awesomeProject/internal/entity"
+	"awesomeProject/internal/dto"
 )
 
 type CarInformationConnector interface {
-	getCarInformation(request RequestParams) *entity.CarInformationData
-	getCaptcha() *entity.CaptchaData
+	GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error)
+	GetCaptcha() (*dto.CaptchaData, error)
 }

@@ -1,9 +1,11 @@
-package entity
+package dto
 
 type ServerConfig struct {
 	Port string `yaml:"serverPort"`
 }
 
+type CarSearchParams struct {
+}
 type CarInformationData struct {
 	HistoryInfo     *HistoryInfo
 	CarAccidentInfo *CarAccidentInfo

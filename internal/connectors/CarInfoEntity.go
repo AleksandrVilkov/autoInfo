@@ -1,6 +1,6 @@
 package connectors
 
-type RequestParams struct {
+type CarRequestParams struct {
 	VinNumber    string
 	Captcha      string
 	CaptchaToken string

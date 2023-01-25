@@ -13,7 +13,8 @@ type Logger struct {
 	dateFormat string
 }
 
-func NewLogger(fileName string, path string) (*Logger, error) {
+func NewLogger(fileName string) (*Logger, error) {
+	path, _ := os.LookupEnv("PATH_LOG")
 
 	if !validateLoggerParams(&fileName, &path) {
 		return nil, errors.New("can not create logger. File name or path is empty")
@@ -21,6 +22,7 @@ func NewLogger(fileName string, path string) (*Logger, error) {
 
 	result := new(Logger)
 	result.dateFormat = "2006-01-02 15:04:05"
+
 	result.fullPath = path + fileName + " " + time.Now().Format(result.dateFormat) + ".log"
 
 	err := createLogFile(&result)

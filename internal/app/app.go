@@ -1,7 +1,7 @@
 package app
 
 import (
-	"awesomeProject/internal/entity"
+	"awesomeProject/internal/dto"
 	"awesomeProject/pkg/logger"
 	myServer "awesomeProject/pkg/server"
 	"gopkg.in/yaml.v3"
@@ -10,9 +10,9 @@ import (
 
 func Run() {
 	server := new(myServer.Server)
-	newLogger, _ := logger.NewLogger("httpServer", "/home/vilkov/GolandProjects/awesomeProject/internal/logs/")
+	newLogger, _ := logger.NewLogger("httpServer")
 	in, _ := os.ReadFile("/home/vilkov/GolandProjects/awesomeProject/internal/config/serverConfig.yaml")
-	var config entity.ServerConfig
+	var config dto.ServerConfig
 	err := yaml.Unmarshal(in, &config)
 
 	if err != nil {
@@ -20,7 +20,6 @@ func Run() {
 	}
 
 	newLogger.WriteInfo("get server configuration successfully")
-	newLogger.WriteInfo("get server configuration successfully2")
 	if err := server.Run(config.Port); err != nil {
 		newLogger.WriteError("Error running http server on port " + config.Port + ": " + err.Error())
 	}

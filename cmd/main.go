@@ -2,8 +2,12 @@ package main
 
 import (
 	"awesomeProject/internal/app"
+	"os"
 )
 
 func main() {
-	app.Run()
+	if os.Setenv("PATH_LOG", "/home/vilkov/GolandProjects/awesomeProject/internal/logs/") == nil {
+		app.Run()
+	}
+
 }
