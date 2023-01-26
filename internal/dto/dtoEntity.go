@@ -14,6 +14,11 @@ type CarInformationData struct {
 	DiagnosticInfo  *DiagnosticInfo
 }
 
+type Captcha struct {
+	Token     string
+	Base64Jpg string
+}
+
 type HistoryInfo struct {
 }
 type CarAccidentInfo struct {

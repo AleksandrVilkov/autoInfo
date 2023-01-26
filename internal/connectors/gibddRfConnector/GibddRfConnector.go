@@ -5,7 +5,6 @@ import (
 	"awesomeProject/internal/dto"
 	"awesomeProject/pkg/logger"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -34,7 +33,7 @@ func NewGibddRFConnector() (*GibddRFConnector, error) {
 	return result, nil
 }
 
-func (g *GibddRFConnector) GetCaptcha() (*entity.CaptchaResp, error) {
+func (g *GibddRFConnector) GetCaptcha() (*dto.Captcha, error) {
 	resp, errReq := http.Get("https://check.gibdd.ru/captcha")
 
 	if errReq != nil || resp.StatusCode != 200 {
@@ -50,8 +49,6 @@ func (g *GibddRFConnector) GetCaptcha() (*entity.CaptchaResp, error) {
 	}
 
 	var result entity.CaptchaResp
-	fmt.Println(string(body))
-
 	errUnmarshal := json.Unmarshal(body, &resp)
 
 	if errUnmarshal != nil {
@@ -59,10 +56,14 @@ func (g *GibddRFConnector) GetCaptcha() (*entity.CaptchaResp, error) {
 		return nil, errUnmarshal
 	}
 
-	return &result, nil
+	captcha := dto.Captcha{
+		Token:     result.Token,
+		Base64Jpg: result.Base64Jpg,
+	}
+	return &captcha, nil
 }
 
-func (g *GibddRFConnector) etHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
+func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
 	return nil
 	//TODO отправка запросов к POST "https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history"
 }

@@ -6,5 +6,5 @@ import (
 
 type CarInformationConnector interface {
 	GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error)
-	GetCaptcha() (*dto.CaptchaData, error)
+	GetCaptcha() (*dto.Captcha, error)
 }
