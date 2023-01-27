@@ -6,6 +6,7 @@ type ServerConfig struct {
 
 type CarSearchParams struct {
 	Vin          string
+	CheckType    string
 	CaptchaToken string
 	CaptchaValue string
 }
