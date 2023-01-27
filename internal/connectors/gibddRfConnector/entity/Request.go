@@ -1,7 +1,7 @@
 package entity
 
 type HistoryReq struct {
-	vin, checkType, captchaWord, captchaToken string
+	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
 type CarAccidentReq struct {
 	vin, checkType, captchaWord, captchaToken string

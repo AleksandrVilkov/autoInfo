@@ -14,7 +14,21 @@ type GibddRFConnector struct {
 }
 
 func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error) {
-	return nil, nil
+
+	historyReq := entity.HistoryReq{
+		Vin:          params.Vin,
+		CheckType:    "history",
+		CaptchaWord:  params.CaptchaValue,
+		CaptchaToken: params.CaptchaToken,
+	}
+
+	historyResp, err := g.getHistoryInfo(historyReq)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ConvertHistoryResponse(historyResp), nil
 }
 
 func NewGibddRFConnector() (*GibddRFConnector, error) {
@@ -60,8 +74,8 @@ func (g *GibddRFConnector) GetCaptcha() (*dto.Captcha, error) {
 	return &captcha, nil
 }
 
-func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
-	return nil
+func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) (*entity.HistoryResp, error) {
+	return nil, nil
 	//TODO отправка запросов к POST "https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history"
 }
 

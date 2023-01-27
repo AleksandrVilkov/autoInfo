@@ -20,7 +20,6 @@ func TestGetCarInformation(t *testing.T) {
 
 	searchParams := dto.CarSearchParams{
 		Vin:          "",
-		CheckType:    "history",
 		CaptchaToken: captcha.Token,
 		CaptchaValue: "",
 	}
