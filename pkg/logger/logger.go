@@ -16,7 +16,7 @@ type Logger struct {
 func NewLogger(fileName string) (*Logger, error) {
 	path, _ := os.LookupEnv("PATH_LOG")
 	if path == "" {
-		path = "/home/vilkov/GolandProjects/awesomeProject/internal/logs/"
+		path = "/home/vilkov/GolandProjects/autoInfo/internal/logs/"
 	}
 
 	if !validateLoggerParams(&fileName, &path) {

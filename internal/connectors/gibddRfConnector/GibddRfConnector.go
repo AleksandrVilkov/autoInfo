@@ -14,21 +14,53 @@ type GibddRFConnector struct {
 }
 
 func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error) {
-
-	historyReq := entity.HistoryReq{
+	//Капча живет некоторое время, ее можно получить, и передать во все запросы
+	historyResp, err := g.getHistoryInfo(entity.HistoryReq{
 		Vin:          params.Vin,
 		CheckType:    "history",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
-	}
+	})
 
-	historyResp, err := g.getHistoryInfo(historyReq)
+	carAccidentResp, err := g.getCarAccidentInfo(entity.CarAccidentReq{
+		Vin:          params.Vin,
+		CheckType:    "aiusdtp",
+		CaptchaWord:  params.CaptchaValue,
+		CaptchaToken: params.CaptchaToken,
+	})
+
+	wantedResp, err := g.getWantedInfo(entity.WantedReq{
+		Vin:          params.Vin,
+		CheckType:    "wanted",
+		CaptchaWord:  params.CaptchaValue,
+		CaptchaToken: params.CaptchaToken,
+	})
+
+	restrictResp, err := g.getRestrictInfo(entity.RestrictReq{
+		Vin:          params.Vin,
+		CheckType:    "restricted",
+		CaptchaWord:  params.CaptchaValue,
+		CaptchaToken: params.CaptchaToken,
+	})
+
+	diagnosticResp, err := g.getDiagnosticInfo(entity.DiagnosticReq{
+		Vin:          params.Vin,
+		CheckType:    "diagnostic",
+		CaptchaWord:  params.CaptchaValue,
+		CaptchaToken: params.CaptchaToken,
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return ConvertHistoryResponse(historyResp), nil
+	return CompleteInformation(entity.FullResponseData{
+		HistoryResp:     historyResp,
+		CarAccidentResp: carAccidentResp,
+		WantedResp:      wantedResp,
+		RestrictResp:    restrictResp,
+		DiagnosticResp:  diagnosticResp,
+	}), nil
 }
 
 func NewGibddRFConnector() (*GibddRFConnector, error) {
@@ -79,21 +111,22 @@ func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) (*entity.Histor
 	//TODO отправка запросов к POST "https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history"
 }
 
-func (g *GibddRFConnector) getCarAccidentInfo(req entity.CarAccidentReq) *entity.CarAccidentResp {
+func (g *GibddRFConnector) getCarAccidentInfo(req entity.CarAccidentReq) (*entity.CarAccidentResp, error) {
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp
-	return nil
+	return nil, nil
 }
 
-func (g *GibddRFConnector) getWantedInfo(req entity.WantedReq) *entity.WantedResp {
+func (g *GibddRFConnector) getWantedInfo(req entity.WantedReq) (*entity.WantedResp, error) {
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted
-	return nil
+	return nil, nil
 }
-func (g *GibddRFConnector) getRestrictInfo(req entity.RestrictReq) *entity.RestrictResp {
-	return nil
+
+func (g *GibddRFConnector) getRestrictInfo(req entity.RestrictReq) (*entity.RestrictResp, error) {
+	return nil, nil
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict
 }
 
-func (g *GibddRFConnector) getDiagnosticInfo(req entity.DiagnosticReq) *entity.DiagnosticResp {
-	return nil
+func (g *GibddRFConnector) getDiagnosticInfo(req entity.DiagnosticReq) (*entity.DiagnosticResp, error) {
+	return nil, nil
 	//TODO отправка запросов к POST https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic
 }

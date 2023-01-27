@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	if os.Setenv("PATH_LOG", "/home/vilkov/GolandProjects/awesomeProject/internal/logs/") == nil {
+	if os.Setenv("PATH_LOG", "/home/vilkov/GolandProjects/autoInfo/internal/logs/") == nil {
 		app.Run()
 	}
 

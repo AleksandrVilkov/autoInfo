@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func ReadCaptcha(pathToPng string) (string, error) {
+func readCaptcha(pathToPng string) (string, error) {
 	client := gosseract.NewClient()
 
 	defer func(client *gosseract.Client) {
@@ -30,7 +30,7 @@ func ReadCaptcha(pathToPng string) (string, error) {
 	return "", nil
 }
 
-func SaveCaptcha(base64jpg string, fileName string) (bool, error) {
+func saveCaptcha(base64jpg string, fileName string) (bool, error) {
 	decodingString, err := base64.StdEncoding.DecodeString(base64jpg)
 
 	if err != nil {
@@ -52,7 +52,7 @@ func SaveCaptcha(base64jpg string, fileName string) (bool, error) {
 	return true, nil
 }
 
-func ConvertHistoryResponse(req *entity.HistoryResp) *dto.CarInformationData {
+func CompleteInformation(fullData entity.FullResponseData) *dto.CarInformationData {
 	var result dto.CarInformationData
 	//TODO implements
 	return &result

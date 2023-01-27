@@ -1,5 +1,13 @@
 package entity
 
+type FullResponseData struct {
+	HistoryResp     *HistoryResp
+	CarAccidentResp *CarAccidentResp
+	WantedResp      *WantedResp
+	RestrictResp    *RestrictResp
+	DiagnosticResp  *DiagnosticResp
+}
+
 type HistoryResp struct {
 	RequestTime   string `json:"requestTime"`
 	RequestResult struct {

@@ -11,7 +11,7 @@ import (
 func Run() {
 	server := new(myServer.Server)
 	newLogger, _ := logger.NewLogger("httpServer")
-	in, _ := os.ReadFile("/home/vilkov/GolandProjects/awesomeProject/internal/config/serverConfig.yaml")
+	in, _ := os.ReadFile("/home/vilkov/GolandProjects/autoInfo/internal/config/serverConfig.yaml")
 	var config dto.ServerConfig
 	err := yaml.Unmarshal(in, &config)
 

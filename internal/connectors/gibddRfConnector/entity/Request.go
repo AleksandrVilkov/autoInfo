@@ -4,17 +4,17 @@ type HistoryReq struct {
 	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
 type CarAccidentReq struct {
-	vin, checkType, captchaWord, captchaToken string
+	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
 
 type WantedReq struct {
-	vin, checkType, captchaWord, captchaToken string
+	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
 
 type RestrictReq struct {
-	vin, checkType, captchaWord, captchaToken string
+	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
 
 type DiagnosticReq struct {
-	vin, checkType, captchaWord, captchaToken string
+	Vin, CheckType, CaptchaWord, CaptchaToken string
 }
