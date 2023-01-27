@@ -24,8 +24,8 @@ func TestGetCarInformation(t *testing.T) {
 		CaptchaValue: "",
 	}
 
-	carInfo, errcarInfo := connector.GetCarInformation(searchParams)
-	if errcarInfo != nil {
+	carInfo, errCarInfo := connector.GetCarInformation(searchParams)
+	if errCarInfo != nil {
 		t.Error("Cann't get car information by vin: " + searchParams.Vin)
 	}
 	fmt.Print(carInfo)
