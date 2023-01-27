@@ -14,10 +14,6 @@ type GibddRFConnector struct {
 }
 
 func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error) {
-	//getCarAccidentInfo()
-	//getWantedInfo()
-	//getRestrictInfo()
-	//getDiagnosticInfo()
 	return nil, nil
 }
 
@@ -48,8 +44,9 @@ func (g *GibddRFConnector) GetCaptcha() (*dto.Captcha, error) {
 		return nil, errBody
 	}
 
+	g.logger.WriteInfo("captcha received successfully: " + string(body))
 	var result entity.CaptchaResp
-	errUnmarshal := json.Unmarshal(body, &resp)
+	errUnmarshal := json.Unmarshal(body, &result)
 
 	if errUnmarshal != nil {
 		g.logger.WriteError("Failed unmarshal response from https://check.gibdd.ru/captcha")

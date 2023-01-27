@@ -5,6 +5,9 @@ type ServerConfig struct {
 }
 
 type CarSearchParams struct {
+	Vin          string
+	CaptchaToken string
+	CaptchaValue string
 }
 type CarInformationData struct {
 	HistoryInfo     *HistoryInfo
