@@ -29,7 +29,7 @@ func saveCaptcha(base64jpg string, fileName string) (bool, error) {
 	return true, nil
 }
 
-func CompleteInformation(fullData entity.FullResponseData) *dto.CarInformationData {
+func CompleteInformation(fullData *entity.FullResponseData) *dto.CarInformationData {
 	var result dto.CarInformationData
 	//TODO implements
 	return &result

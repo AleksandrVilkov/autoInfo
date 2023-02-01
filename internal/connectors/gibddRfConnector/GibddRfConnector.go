@@ -14,53 +14,50 @@ type GibddRFConnector struct {
 	logger logger.Logger
 }
 
-func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) (*dto.CarInformationData, error) {
+func (g *GibddRFConnector) GetCarInformation(params dto.CarSearchParams) *dto.CarInformationData {
 	//Капча живет некоторое время, ее можно получить, и передать во все запросы
-	historyResp, err := g.getHistoryInfo(entity.HistoryReq{
+	historyResp := g.getHistoryInfo(entity.HistoryReq{
 		Vin:          params.Vin,
 		CheckType:    "history",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
 	})
-	carAccidentResp, err := g.getCarAccidentInfo(entity.CarAccidentReq{
+
+	carAccidentResp := g.getCarAccidentInfo(entity.CarAccidentReq{
 		Vin:          params.Vin,
 		CheckType:    "aiusdtp",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
 	})
 
-	wantedResp, err := g.getWantedInfo(entity.WantedReq{
+	wantedResp := g.getWantedInfo(entity.WantedReq{
 		Vin:          params.Vin,
 		CheckType:    "wanted",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
 	})
 
-	restrictResp, err := g.getRestrictInfo(entity.RestrictReq{
+	restrictResp := g.getRestrictInfo(entity.RestrictReq{
 		Vin:          params.Vin,
 		CheckType:    "restricted",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
 	})
 
-	diagnosticResp, err := g.getDiagnosticInfo(entity.DiagnosticReq{
+	diagnosticResp := g.getDiagnosticInfo(entity.DiagnosticReq{
 		Vin:          params.Vin,
 		CheckType:    "diagnostic",
 		CaptchaWord:  params.CaptchaValue,
 		CaptchaToken: params.CaptchaToken,
 	})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return CompleteInformation(entity.FullResponseData{
+	return CompleteInformation(&entity.FullResponseData{
 		HistoryResp:     historyResp,
 		CarAccidentResp: carAccidentResp,
 		WantedResp:      wantedResp,
 		RestrictResp:    restrictResp,
 		DiagnosticResp:  diagnosticResp,
-	}), nil
+	})
 }
 
 func NewGibddRFConnector() (*GibddRFConnector, error) {
@@ -75,174 +72,122 @@ func NewGibddRFConnector() (*GibddRFConnector, error) {
 	return result, nil
 }
 
-func (g *GibddRFConnector) GetCaptcha() (*dto.Captcha, error) {
-	resp, errReq := http.Get("https://check.gibdd.ru/captcha")
+func (g *GibddRFConnector) GetCaptcha() *dto.Captcha {
+	connectorPath := "/captcha"
+	resp, errReq := http.Get("https://check.gibdd.ru" + connectorPath)
 
-	if errReq != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed GET Request Attempt to https://check.gibdd.ru/captcha")
-		return nil, errReq
-	}
+	g.checkError("Failed GET Request Attempt to "+connectorPath, errReq)
 
 	body, errBody := io.ReadAll(resp.Body)
 
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://check.gibdd.ru/captcha")
-		return nil, errBody
-	}
+	g.checkError("Failed read response body from https://check.gibdd.ru"+connectorPath, errBody)
 
 	g.logger.WriteInfo("captcha received successfully: " + string(body))
 	var result entity.CaptchaResp
 	errUnmarshal := json.Unmarshal(body, &result)
 
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://check.gibdd.ru/captcha")
-		return nil, errUnmarshal
-	}
+	g.checkError("Failed unmarshal response from https://check.gibdd.ru"+connectorPath, errUnmarshal)
 
 	captcha := dto.Captcha{
 		Token:     result.Token,
 		Base64Jpg: result.Base64Jpg,
 	}
-	return &captcha, nil
+
+	return &captcha
 }
 
-func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) (*entity.HistoryResp, error) {
-
-	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history", url.Values{
+func (g *GibddRFConnector) getHistoryInfo(req entity.HistoryReq) *entity.HistoryResp {
+	connectorPath := "/check/auto/history"
+	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy"+connectorPath, url.Values{
 		"vin":          {req.Vin},
 		"checkType":    {req.CheckType},
 		"captchaWord":  {req.CaptchaWord},
 		"captchaToken": {req.CaptchaToken},
 	})
 
-	if err != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed POST Request Attempt to https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history")
-		return nil, err
-	}
-
+	g.checkError("Failed POST Request Attempt to "+connectorPath, err)
 	body, errBody := io.ReadAll(resp.Body)
-
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history")
-		return nil, err
-	}
-
+	g.checkError("Failed read response body from "+connectorPath, errBody)
 	var result entity.HistoryResp
 	errUnmarshal := json.Unmarshal(body, &result)
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/history")
-	}
-	return &result, nil
+	g.checkError("Failed unmarshal response from "+connectorPath, errUnmarshal)
+	return &result
 }
 
-func (g *GibddRFConnector) getCarAccidentInfo(req entity.CarAccidentReq) (*entity.CarAccidentResp, error) {
-	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp", url.Values{
+func (g *GibddRFConnector) getCarAccidentInfo(req entity.CarAccidentReq) *entity.CarAccidentResp {
+	connectorPath := "/check/auto/dtp"
+	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy"+connectorPath, url.Values{
 		"vin":          {req.Vin},
 		"checkType":    {req.CheckType},
 		"captchaWord":  {req.CaptchaWord},
 		"captchaToken": {req.CaptchaToken},
 	})
-
-	if err != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed POST Request Attempt to https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp")
-		return nil, err
-	}
-
+	g.checkError("Failed POST Request Attempt "+connectorPath, err)
 	body, errBody := io.ReadAll(resp.Body)
-
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp")
-		return nil, err
-	}
-
+	g.checkError("Failed read response body from "+connectorPath, errBody)
 	var result entity.CarAccidentResp
 	errUnmarshal := json.Unmarshal(body, &result)
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/dtp")
-	}
-	return &result, nil
+	g.checkError("Failed unmarshal response from "+connectorPath, errUnmarshal)
+	return &result
 }
 
-func (g *GibddRFConnector) getWantedInfo(req entity.WantedReq) (*entity.WantedResp, error) {
-	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted", url.Values{
+func (g *GibddRFConnector) getWantedInfo(req entity.WantedReq) *entity.WantedResp {
+	connectorPath := "/check/auto/wanted"
+	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy"+connectorPath, url.Values{
 		"vin":          {req.Vin},
 		"checkType":    {req.CheckType},
 		"captchaWord":  {req.CaptchaWord},
 		"captchaToken": {req.CaptchaToken},
 	})
 
-	if err != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed POST Request Attempt to https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted")
-		return nil, err
-	}
-
+	g.checkError("Failed POST Request Attempt to "+connectorPath, err)
 	body, errBody := io.ReadAll(resp.Body)
-
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted")
-		return nil, err
-	}
+	g.checkError("Failed read response body from "+connectorPath, errBody)
 
 	var result entity.WantedResp
 	errUnmarshal := json.Unmarshal(body, &result)
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/wanted")
-	}
-	return &result, nil
+	g.checkError("Failed unmarshal response from "+connectorPath, errUnmarshal)
+	return &result
 }
 
-func (g *GibddRFConnector) getRestrictInfo(req entity.RestrictReq) (*entity.RestrictResp, error) {
-	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict", url.Values{
+func (g *GibddRFConnector) getRestrictInfo(req entity.RestrictReq) *entity.RestrictResp {
+	connectorPath := "/check/auto/restrict"
+	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy"+connectorPath, url.Values{
 		"vin":          {req.Vin},
 		"checkType":    {req.CheckType},
 		"captchaWord":  {req.CaptchaWord},
 		"captchaToken": {req.CaptchaToken},
 	})
-
-	if err != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed POST Request Attempt to https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict")
-		return nil, err
-	}
+	g.checkError("Failed POST Request Attempt to "+connectorPath, err)
 
 	body, errBody := io.ReadAll(resp.Body)
-
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict")
-		return nil, err
-	}
-
+	g.checkError("Failed read response body from "+connectorPath, errBody)
 	var result entity.RestrictResp
 	errUnmarshal := json.Unmarshal(body, &result)
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/restrict")
-	}
-	return &result, nil
+	g.checkError("Failed unmarshal response from "+connectorPath, errUnmarshal)
+	return &result
 }
 
-func (g *GibddRFConnector) getDiagnosticInfo(req entity.DiagnosticReq) (*entity.DiagnosticResp, error) {
-	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic", url.Values{
+func (g *GibddRFConnector) getDiagnosticInfo(req entity.DiagnosticReq) *entity.DiagnosticResp {
+	connectorPath := "/check/auto/diagnostic"
+	resp, err := http.PostForm("https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy"+connectorPath, url.Values{
 		"vin":          {req.Vin},
 		"checkType":    {req.CheckType},
 		"captchaWord":  {req.CaptchaWord},
 		"captchaToken": {req.CaptchaToken},
 	})
 
-	if err != nil || resp.StatusCode != 200 {
-		g.logger.WriteError("Failed POST Request Attempt to https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic")
-		return nil, err
-	}
-
+	g.checkError("Failed POST Request Attempt to "+connectorPath, err)
 	body, errBody := io.ReadAll(resp.Body)
-
-	if errBody != nil {
-		g.logger.WriteError("Failed read response body from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic")
-		return nil, err
-	}
-
+	g.checkError("Failed read response body from "+connectorPath, errBody)
 	var result entity.DiagnosticResp
 	errUnmarshal := json.Unmarshal(body, &result)
-	if errUnmarshal != nil {
-		g.logger.WriteError("Failed unmarshal response from https://xn--b1afk4ade.xn--90adear.xn--p1ai/proxy/check/auto/diagnostic")
+	g.checkError("Failed unmarshal response from "+connectorPath, errUnmarshal)
+	return &result
+}
+
+func (g *GibddRFConnector) checkError(msg string, err error) {
+	if err != nil {
+		g.logger.WriteError(msg)
 	}
-	return &result, nil
 }
