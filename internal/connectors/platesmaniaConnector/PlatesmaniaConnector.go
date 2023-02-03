@@ -3,6 +3,8 @@ package platesmaniaConnector
 import (
 	"awesomeProject/internal/dto"
 	"awesomeProject/pkg/logger"
+	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -34,8 +36,11 @@ func (p *PlatesmaniaConnector) GetPhoto(grz string) *dto.CarPhoto {
 	url := "https://platesmania.com/ru/gallery.php?fastsearch=" + grz
 	resp, err := http.Get(url)
 	p.checkError("Failed GET Request Attempt to "+url, err)
-	body := resp.Body
-	//TODO
+	body, errBody := io.ReadAll(resp.Body)
+	p.checkError("Error read body from "+url, errBody)
+	fmt.Println(body)
+	//TODO need parse html
+
 	return nil
 }
 
