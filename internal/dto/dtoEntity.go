@@ -37,3 +37,9 @@ type CaptchaData struct {
 	Token     string `json:"token"`
 	Base64Jpg string `json:"base64jpg"`
 }
+
+type CarPhoto struct {
+	Grz            string
+	PhotosLink     []string
+	additionalInfo map[string]string
+}

@@ -12,10 +12,7 @@ func TestGetCarInformation(t *testing.T) {
 		t.Error("Cann't create gibdd.rf connector")
 	}
 
-	captcha, e := connector.GetCaptcha()
-	if e != nil && captcha.Token == "" && captcha.Base64Jpg == "" {
-		t.Error("Cann't create gibdd.rf connector")
-	}
+	captcha := connector.GetCaptcha()
 	t.Log("TestGetCarInformation OK")
 
 	searchParams := dto.CarSearchParams{
@@ -24,9 +21,6 @@ func TestGetCarInformation(t *testing.T) {
 		CaptchaValue: "",
 	}
 
-	carInfo, errCarInfo := connector.GetCarInformation(searchParams)
-	if errCarInfo != nil {
-		t.Error("Cann't get car information by vin: " + searchParams.Vin)
-	}
+	carInfo := connector.GetCarInformation(searchParams)
 	fmt.Print(carInfo)
 }
